@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Juego Pacman
 
 Un juego simple de Pacman creado con tecnologías web modernas: HTML5, CSS3 y JavaScript.
@@ -30,3 +31,7 @@ Esto iniciará un servidor local en `http://127.0.0.1:8081` donde podrás jugar.
 - HTML5 Canvas para renderizar el juego
 - CSS3 para estilos
 - JavaScript para la lógica del juego
+=======
+# Pacman
+Creando juego Pacman
+>>>>>>> 18cd1722e0485d38dbab781e7065e3e12647eaaa
