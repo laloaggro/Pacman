@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 # Juego Pacman
 
-Un juego simple de Pacman creado con tecnologías web modernas: HTML5, CSS3 y JavaScript.
+Un juego de Pacman basado en la versión original de Namco creado con tecnologías web modernas: HTML5, CSS3 y JavaScript.
 
 ## Cómo jugar
 
@@ -23,14 +23,20 @@ Esto iniciará un servidor local en `http://127.0.0.1:8081` donde podrás jugar.
 
 - Movimiento de Pacman con teclas de flecha
 - Sistema de puntuación
-- Laberinto con paredes, comida y pastillas especiales
+- Laberinto con diseño original de Namco
+- Comida normal y pastillas especiales
 - Túneles para pasar de un lado a otro del mapa
+- Colores y estilo del juego original
 
 ## Tecnologías utilizadas
 
 - HTML5 Canvas para renderizar el juego
 - CSS3 para estilos
 - JavaScript para la lógica del juego
+
+## Historial de versiones
+
+Consulta el archivo [CHANGELOG.md](CHANGELOG.md) para ver el historial de cambios.
 =======
 # Pacman
 Creando juego Pacman

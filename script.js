@@ -11,13 +11,14 @@ const cols = canvas.width / tileSize;
 // Variables del juego
 let score = 0;
 let pacman = {
-    x: 10,
-    y: 15,
+    x: 13,
+    y: 23,
     direction: 'right',
     nextDirection: 'right'
 };
 
 // Mapa del juego (1 = pared, 0 = comida, 2 = espacio vacío, 3 = pastilla especial)
+// Este mapa se basa en el diseño original de Namco
 const gameMap = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -50,17 +51,17 @@ function drawMap() {
             const y = row * tileSize;
             
             if (tile === 1) {
-                // Pared
-                ctx.fillStyle = '#0000FF';
+                // Pared (azul original de Namco)
+                ctx.fillStyle = '#2121ff';
                 ctx.fillRect(x, y, tileSize, tileSize);
             } else if (tile === 0) {
-                // Comida
+                // Comida (puntos pequeños blancos)
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
                 ctx.arc(x + tileSize/2, y + tileSize/2, 3, 0, Math.PI * 2);
                 ctx.fill();
             } else if (tile === 3) {
-                // Pastilla especial
+                // Pastilla especial (puntos grandes blancos)
                 ctx.fillStyle = '#FFFF00';
                 ctx.beginPath();
                 ctx.arc(x + tileSize/2, y + tileSize/2, 8, 0, Math.PI * 2);
@@ -75,7 +76,7 @@ function drawPacman() {
     const x = pacman.x * tileSize;
     const y = pacman.y * tileSize;
     
-    // Dibujar cuerpo de Pacman
+    // Dibujar cuerpo de Pacman (amarillo original)
     ctx.fillStyle = '#FFFF00';
     ctx.beginPath();
     
@@ -97,7 +98,7 @@ function drawPacman() {
         endAngle = 0.3 * Math.PI;
     }
     
-    ctx.arc(x + tileSize/2, y + tileSize/2, tileSize/2, startAngle, endAngle);
+    ctx.arc(x + tileSize/2, y + tileSize/2, tileSize/2 - 2, startAngle, endAngle);
     ctx.lineTo(x + tileSize/2, y + tileSize/2);
     ctx.fill();
 }

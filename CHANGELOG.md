@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## [1.1.0] - 2024-08-19
+
+### Cambiado
+- Actualizado el diseño del juego para que se parezca más al original de Namco
+- Mejorado el mapa del laberinto con un diseño más fiel al original
+- Actualizados los colores para coincidir con la estética original (amarillo para Pacman, azul para las paredes)
+- Mejorado el estilo visual con tipografía y bordes más acordes al juego original
+
 ## [1.0.0] - 2024-08-19
 
 ### Añadido
