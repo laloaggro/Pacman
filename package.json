@@ -1,0 +1,16 @@
+{
+  "name": "pacman-game",
+  "version": "1.0.0",
+  "description": "Un juego de Pacman simple creado con HTML, CSS y JavaScript",
+  "main": "script.js",
+  "scripts": {
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["game", "pacman", "html5", "javascript"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
