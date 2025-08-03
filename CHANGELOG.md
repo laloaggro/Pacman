@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## [1.3.1] - 2024-08-19
+
+### Cambiado
+- Mejorado el algoritmo de movimiento de Blinky (fantasma rojo) para que use la distancia de Manhattan
+- Optimizado el cálculo de direcciones para todos los fantasmas
+- Mejorada la precisión del comportamiento de los fantasmas según el juego original
+
 ## [1.3.0] - 2024-08-19
 
 ### Añadido

@@ -152,6 +152,53 @@ function drawGhosts() {
     }
 }
 
+// Calcular la mejor dirección para un fantasma usando la distancia de Manhattan
+function calculateBestDirection(ghostX, ghostY, targetX, targetY, currentDirection) {
+    // Calcular distancias en cada dirección posible
+    let distances = {};
+    
+    // Derecha
+    if (canMove(ghostX, ghostY, 'right')) {
+        const dx = Math.abs((ghostX + 1) - targetX);
+        const dy = Math.abs(ghostY - targetY);
+        distances.right = dx + dy;
+    }
+    
+    // Izquierda
+    if (canMove(ghostX, ghostY, 'left')) {
+        const dx = Math.abs((ghostX - 1) - targetX);
+        const dy = Math.abs(ghostY - targetY);
+        distances.left = dx + dy;
+    }
+    
+    // Arriba
+    if (canMove(ghostX, ghostY, 'up')) {
+        const dx = Math.abs(ghostX - targetX);
+        const dy = Math.abs((ghostY - 1) - targetY);
+        distances.up = dx + dy;
+    }
+    
+    // Abajo
+    if (canMove(ghostX, ghostY, 'down')) {
+        const dx = Math.abs(ghostX - targetX);
+        const dy = Math.abs((ghostY + 1) - targetY);
+        distances.down = dx + dy;
+    }
+    
+    // Encontrar la dirección con la menor distancia
+    let bestDirection = currentDirection;
+    let minDistance = Infinity;
+    
+    for (let direction in distances) {
+        if (distances[direction] < minDistance) {
+            minDistance = distances[direction];
+            bestDirection = direction;
+        }
+    }
+    
+    return bestDirection;
+}
+
 // Mover fantasmas con comportamientos específicos
 function moveGhosts() {
     for (let ghost of ghosts) {
@@ -162,23 +209,8 @@ function moveGhosts() {
         // Comportamiento según el tipo de fantasma
         switch (ghost.behavior) {
             case 'chase': // Blinky (Rojo) - Persigue directamente a Pacman
-                if (Math.random() < 0.8) { // 80% de probabilidad de tomar decisiones inteligentes
-                    // Calcular dirección hacia Pacman
-                    const dx = pacman.x - ghost.x;
-                    const dy = pacman.y - ghost.y;
-                    
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        // Mover horizontalmente
-                        ghost.direction = dx > 0 ? 'right' : 'left';
-                    } else {
-                        // Mover verticalmente
-                        ghost.direction = dy > 0 ? 'down' : 'up';
-                    }
-                } else {
-                    // 20% de probabilidad de movimiento aleatorio
-                    const directions = ['up', 'down', 'left', 'right'];
-                    ghost.direction = directions[Math.floor(Math.random() * directions.length)];
-                }
+                // Usar algoritmo de distancia de Manhattan para perseguir a Pacman
+                ghost.direction = calculateBestDirection(ghost.x, ghost.y, pacman.x, pacman.y, ghost.direction);
                 break;
                 
             case 'ambush': // Pinky (Rosa) - Se posiciona delante de Pacman
@@ -187,7 +219,7 @@ function moveGhosts() {
                     let targetX = pacman.x;
                     let targetY = pacman.y;
                     
-                    // Ajustar según dirección de Pacman
+                    // Ajustar según dirección de Pacman (4 casillas adelante)
                     switch (pacman.direction) {
                         case 'right':
                             targetX += 4;
@@ -203,15 +235,8 @@ function moveGhosts() {
                             break;
                     }
                     
-                    // Calcular dirección hacia posición prevista
-                    const dx = targetX - ghost.x;
-                    const dy = targetY - ghost.y;
-                    
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        ghost.direction = dx > 0 ? 'right' : 'left';
-                    } else {
-                        ghost.direction = dy > 0 ? 'down' : 'up';
-                    }
+                    // Calcular la mejor dirección usando distancia de Manhattan
+                    ghost.direction = calculateBestDirection(ghost.x, ghost.y, targetX, targetY, ghost.direction);
                 } else {
                     // 30% de probabilidad de movimiento aleatorio
                     const directions = ['up', 'down', 'left', 'right'];
