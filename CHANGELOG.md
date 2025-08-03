@@ -1,5 +1,18 @@
 # Historial de cambios
 
+## [1.3.0] - 2024-08-19
+
+### Añadido
+- Implementación de comportamientos específicos para cada fantasma:
+  - Blinky (Rojo) persigue directamente a Pacman
+  - Pinky (Rosa) se posiciona delante de Pacman para interceptarlo
+  - Inky (Celeste) tiene movimiento errático
+  - Clyde (Naranja) se comporta de forma aleatoria cuando está lejos y huye cuando está cerca
+
+### Cambiado
+- Mejora en el movimiento de los fantasmas para que sea más similar al juego original
+- Optimización del código de movimiento de fantasmas
+
 ## [1.2.0] - 2024-08-19
 
 ### Añadido

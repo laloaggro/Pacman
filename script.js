@@ -21,12 +21,12 @@ let pacman = {
     nextDirection: 'right'
 };
 
-// Fantasmas con sus colores originales
+// Fantasmas con sus colores originales y comportamientos
 let ghosts = [
-    { x: 9, y: 9, color: '#ff0000', name: 'Blinky', direction: 'left' },   // Rojo
-    { x: 8, y: 9, color: '#ffb8ff', name: 'Pinky', direction: 'up' },     // Rosa
-    { x: 9, y: 8, color: '#00ffff', name: 'Inky', direction: 'down' },    // Celeste
-    { x: 8, y: 8, color: '#ffb852', name: 'Clyde', direction: 'right' }   // Naranjo
+    { x: 9, y: 9, color: '#ff0000', name: 'Blinky', direction: 'left', behavior: 'chase' },   // Rojo - Persigue a Pacman
+    { x: 8, y: 9, color: '#ffb8ff', name: 'Pinky', direction: 'up', behavior: 'ambush' },     // Rosa - Se anticipa a Pacman
+    { x: 9, y: 8, color: '#00ffff', name: 'Inky', direction: 'down', behavior: 'random' },    // Celeste - Movimiento errático
+    { x: 8, y: 8, color: '#ffb852', name: 'Clyde', direction: 'right', behavior: 'frightened' }   // Naranja - Aleatorio
 ];
 
 // Mapa del juego (1 = pared, 0 = comida, 2 = espacio vacío, 3 = pastilla especial)
@@ -152,18 +152,101 @@ function drawGhosts() {
     }
 }
 
-// Mover fantasmas
+// Mover fantasmas con comportamientos específicos
 function moveGhosts() {
     for (let ghost of ghosts) {
-        // Cambiar dirección aleatoriamente
-        if (Math.random() < 0.1) {
-            const directions = ['up', 'down', 'left', 'right'];
-            ghost.direction = directions[Math.floor(Math.random() * directions.length)];
-        }
-        
         // Guardar posición actual
         let newX = ghost.x;
         let newY = ghost.y;
+        
+        // Comportamiento según el tipo de fantasma
+        switch (ghost.behavior) {
+            case 'chase': // Blinky (Rojo) - Persigue directamente a Pacman
+                if (Math.random() < 0.8) { // 80% de probabilidad de tomar decisiones inteligentes
+                    // Calcular dirección hacia Pacman
+                    const dx = pacman.x - ghost.x;
+                    const dy = pacman.y - ghost.y;
+                    
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        // Mover horizontalmente
+                        ghost.direction = dx > 0 ? 'right' : 'left';
+                    } else {
+                        // Mover verticalmente
+                        ghost.direction = dy > 0 ? 'down' : 'up';
+                    }
+                } else {
+                    // 20% de probabilidad de movimiento aleatorio
+                    const directions = ['up', 'down', 'left', 'right'];
+                    ghost.direction = directions[Math.floor(Math.random() * directions.length)];
+                }
+                break;
+                
+            case 'ambush': // Pinky (Rosa) - Se posiciona delante de Pacman
+                if (Math.random() < 0.7) { // 70% de probabilidad de tomar decisiones inteligentes
+                    // Predecir posición de Pacman
+                    let targetX = pacman.x;
+                    let targetY = pacman.y;
+                    
+                    // Ajustar según dirección de Pacman
+                    switch (pacman.direction) {
+                        case 'right':
+                            targetX += 4;
+                            break;
+                        case 'left':
+                            targetX -= 4;
+                            break;
+                        case 'up':
+                            targetY -= 4;
+                            break;
+                        case 'down':
+                            targetY += 4;
+                            break;
+                    }
+                    
+                    // Calcular dirección hacia posición prevista
+                    const dx = targetX - ghost.x;
+                    const dy = targetY - ghost.y;
+                    
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        ghost.direction = dx > 0 ? 'right' : 'left';
+                    } else {
+                        ghost.direction = dy > 0 ? 'down' : 'up';
+                    }
+                } else {
+                    // 30% de probabilidad de movimiento aleatorio
+                    const directions = ['up', 'down', 'left', 'right'];
+                    ghost.direction = directions[Math.floor(Math.random() * directions.length)];
+                }
+                break;
+                
+            case 'random': // Inky (Celeste) - Movimiento errático
+                if (Math.random() < 0.5) { // 50% de probabilidad de movimiento aleatorio
+                    const directions = ['up', 'down', 'left', 'right'];
+                    ghost.direction = directions[Math.floor(Math.random() * directions.length)];
+                }
+                // Si no cambia, mantiene la dirección actual
+                break;
+                
+            case 'frightened': // Clyde (Naranja) - Aleatorio cuando está lejos, huye cuando está cerca
+                const distance = Math.sqrt(Math.pow(pacman.x - ghost.x, 2) + Math.pow(pacman.y - ghost.y, 2));
+                
+                if (distance < 8) {
+                    // Huir de Pacman cuando está cerca
+                    const dx = pacman.x - ghost.x;
+                    const dy = pacman.y - ghost.y;
+                    
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        ghost.direction = dx > 0 ? 'left' : 'right';
+                    } else {
+                        ghost.direction = dy > 0 ? 'up' : 'down';
+                    }
+                } else {
+                    // Moverse aleatoriamente cuando está lejos
+                    const directions = ['up', 'down', 'left', 'right'];
+                    ghost.direction = directions[Math.floor(Math.random() * directions.length)];
+                }
+                break;
+        }
         
         // Mover en la dirección actual
         switch (ghost.direction) {
