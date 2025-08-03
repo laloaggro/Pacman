@@ -4,8 +4,8 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 
 // Crear elementos de audio
-const eatSound = new Audio();
-const dieSound = new Audio();
+const eatSound = new Audio('audio/eat.wav'); // Asumiendo que tienes el archivo de audio en la carpeta 'audio'
+const dieSound = new Audio('audio/die.wav'); // Asumiendo que tienes el archivo de audio en la carpeta 'audio'
 
 // Tamaño del mapa
 const tileSize = 30;
@@ -385,16 +385,31 @@ function eatFood() {
         score += 10;
         scoreElement.textContent = score;
         // Reproducir sonido de comer
-        // eatSound.currentTime = 0;
-        // eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
+        eatSound.currentTime = 0;
+        eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
     } else if (tile === 3) {
         // Pastilla especial
         gameMap[pacman.y][pacman.x] = 2; // Marcar como comida comida
         score += 50;
         scoreElement.textContent = score;
-        // Reproducir sonido de comer
-        // eatSound.currentTime = 0;
-        // eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
+        // Reproducir sonido de comer pastilla especial
+        eatSound.currentTime = 0;
+        eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
+    }
+}
+
+// Manejar colisión con fantasmas
+function checkGhostCollision() {
+    for (let ghost of ghosts) {
+        if (pacman.x === ghost.x && pacman.y === ghost.y) {
+            // Pacman choca con un fantasma
+            // Reproducir sonido de muerte
+            dieSound.currentTime = 0;
+            dieSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
+            // Reiniciar juego o vida (lógica a implementar)
+            console.log("Pacman ha muerto");
+            break;
+        }
     }
 }
 
@@ -429,6 +444,9 @@ function gameLoop() {
     // Mover a Pacman y fantasmas
     movePacman();
     moveGhosts();
+    
+    // Verificar colisión con fantasmas
+    checkGhostCollision();
     
     // Continuar el bucle
     setTimeout(gameLoop, 150);
