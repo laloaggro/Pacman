@@ -1,5 +1,17 @@
 # Historial de cambios
 
+## [1.2.0] - 2024-08-19
+
+### Añadido
+- Implementación de fantasmas con colores originales (Blinky, Pinky, Inky y Clyde)
+- Movimiento básico de los fantasmas
+- Diseño mejorado de los fantasmas con ojos y forma característica
+- Añadida una carpeta para archivos de audio (para futura implementación)
+
+### Cambiado
+- Corrección de colores para que sean más fieles al juego original
+- Mejoras en la representación visual de Pacman
+
 ## [1.1.0] - 2024-08-19
 
 ### Cambiado

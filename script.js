@@ -3,6 +3,10 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 
+// Crear elementos de audio
+const eatSound = new Audio();
+const dieSound = new Audio();
+
 // Tamaño del mapa
 const tileSize = 30;
 const rows = canvas.height / tileSize;
@@ -11,34 +15,42 @@ const cols = canvas.width / tileSize;
 // Variables del juego
 let score = 0;
 let pacman = {
-    x: 13,
-    y: 23,
+    x: 9,
+    y: 15,
     direction: 'right',
     nextDirection: 'right'
 };
 
+// Fantasmas con sus colores originales
+let ghosts = [
+    { x: 9, y: 9, color: '#ff0000', name: 'Blinky', direction: 'left' },   // Rojo
+    { x: 8, y: 9, color: '#ffb8ff', name: 'Pinky', direction: 'up' },     // Rosa
+    { x: 9, y: 8, color: '#00ffff', name: 'Inky', direction: 'down' },    // Celeste
+    { x: 8, y: 8, color: '#ffb852', name: 'Clyde', direction: 'right' }   // Naranjo
+];
+
 // Mapa del juego (1 = pared, 0 = comida, 2 = espacio vacío, 3 = pastilla especial)
-// Este mapa se basa en el diseño original de Namco
+// Diseño basado en el laberinto original de Pacman de Namco
 const gameMap = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-    [1, 3, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 3, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+    [1, 3, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 3, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-    [2, 2, 2, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 2, 2, 2],
-    [1, 1, 1, 1, 0, 1, 2, 1, 1, 0, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1],
-    [2, 2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 1, 2, 2, 2, 0, 2, 2, 2, 2],
-    [1, 1, 1, 1, 0, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1],
-    [2, 2, 2, 1, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 1, 2, 2, 2],
-    [1, 1, 1, 1, 0, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 0, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-    [1, 3, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 3, 1],
-    [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1],
-    [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 1, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 1, 2, 2, 2, 2],
+    [1, 1, 1, 1, 1, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2],
+    [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 2, 2, 2, 2],
+    [1, 1, 1, 1, 1, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+    [1, 3, 0, 0, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 1, 0, 0, 3, 1],
+    [1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
@@ -55,14 +67,14 @@ function drawMap() {
                 ctx.fillStyle = '#2121ff';
                 ctx.fillRect(x, y, tileSize, tileSize);
             } else if (tile === 0) {
-                // Comida (puntos pequeños blancos)
-                ctx.fillStyle = '#FFFFFF';
+                // Comida (puntos pequeños)
+                ctx.fillStyle = '#ffb8ae';
                 ctx.beginPath();
                 ctx.arc(x + tileSize/2, y + tileSize/2, 3, 0, Math.PI * 2);
                 ctx.fill();
             } else if (tile === 3) {
-                // Pastilla especial (puntos grandes blancos)
-                ctx.fillStyle = '#FFFF00';
+                // Pastilla especial (puntos grandes)
+                ctx.fillStyle = '#ffb8ae';
                 ctx.beginPath();
                 ctx.arc(x + tileSize/2, y + tileSize/2, 8, 0, Math.PI * 2);
                 ctx.fill();
@@ -77,7 +89,7 @@ function drawPacman() {
     const y = pacman.y * tileSize;
     
     // Dibujar cuerpo de Pacman (amarillo original)
-    ctx.fillStyle = '#FFFF00';
+    ctx.fillStyle = '#ffff00';
     ctx.beginPath();
     
     // Ángulo de la boca según la dirección
@@ -101,6 +113,87 @@ function drawPacman() {
     ctx.arc(x + tileSize/2, y + tileSize/2, tileSize/2 - 2, startAngle, endAngle);
     ctx.lineTo(x + tileSize/2, y + tileSize/2);
     ctx.fill();
+}
+
+// Dibujar fantasmas
+function drawGhosts() {
+    for (let ghost of ghosts) {
+        const x = ghost.x * tileSize;
+        const y = ghost.y * tileSize;
+        
+        // Cuerpo del fantasma
+        ctx.fillStyle = ghost.color;
+        ctx.beginPath();
+        ctx.arc(x + tileSize/2, y + tileSize/2 - 2, tileSize/2 - 2, Math.PI, 0, false);
+        ctx.lineTo(x + tileSize, y + tileSize - 5);
+        
+        // Parte ondulada inferior
+        for (let i = 0; i < 3; i++) {
+            ctx.lineTo(x + tileSize - i * tileSize/3, y + tileSize - 5 + (i % 2 === 0 ? 5 : 0));
+        }
+        
+        ctx.lineTo(x, y + tileSize - 5);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Ojos
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(x + tileSize/3, y + tileSize/2 - 2, 3, 0, Math.PI * 2);
+        ctx.arc(x + 2*tileSize/3, y + tileSize/2 - 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Pupilas
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(x + tileSize/3 + 1, y + tileSize/2 - 2, 1, 0, Math.PI * 2);
+        ctx.arc(x + 2*tileSize/3 + 1, y + tileSize/2 - 2, 1, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+// Mover fantasmas
+function moveGhosts() {
+    for (let ghost of ghosts) {
+        // Cambiar dirección aleatoriamente
+        if (Math.random() < 0.1) {
+            const directions = ['up', 'down', 'left', 'right'];
+            ghost.direction = directions[Math.floor(Math.random() * directions.length)];
+        }
+        
+        // Guardar posición actual
+        let newX = ghost.x;
+        let newY = ghost.y;
+        
+        // Mover en la dirección actual
+        switch (ghost.direction) {
+            case 'right':
+                newX++;
+                break;
+            case 'left':
+                newX--;
+                break;
+            case 'up':
+                newY--;
+                break;
+            case 'down':
+                newY++;
+                break;
+        }
+        
+        // Manejar túneles
+        if (newX < 0) {
+            newX = cols - 1;
+        } else if (newX >= cols) {
+            newX = 0;
+        }
+        
+        // Verificar si la posición es válida
+        if (newY >= 0 && newY < rows && gameMap[newY][newX] !== 1) {
+            ghost.x = newX;
+            ghost.y = newY;
+        }
+    }
 }
 
 // Mover a Pacman
@@ -151,7 +244,7 @@ function canMove(x, y, direction) {
         case 'left':
             newX--;
             break;
-            case 'up':
+        case 'up':
             newY--;
             break;
         case 'down':
@@ -183,11 +276,17 @@ function eatFood() {
         gameMap[pacman.y][pacman.x] = 2; // Marcar como comida comida
         score += 10;
         scoreElement.textContent = score;
+        // Reproducir sonido de comer
+        // eatSound.currentTime = 0;
+        // eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
     } else if (tile === 3) {
         // Pastilla especial
         gameMap[pacman.y][pacman.x] = 2; // Marcar como comida comida
         score += 50;
         scoreElement.textContent = score;
+        // Reproducir sonido de comer
+        // eatSound.currentTime = 0;
+        // eatSound.play().catch(e => console.log("No se pudo reproducir el sonido"));
     }
 }
 
@@ -216,10 +315,12 @@ function gameLoop() {
     
     // Dibujar el juego
     drawMap();
+    drawGhosts();
     drawPacman();
     
-    // Mover a Pacman
+    // Mover a Pacman y fantasmas
     movePacman();
+    moveGhosts();
     
     // Continuar el bucle
     setTimeout(gameLoop, 150);
